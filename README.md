@@ -5,7 +5,7 @@ RGBanalysis
 
 This repository contains code for analysing color data over time collected using an open-hardware perovskite film degradation chamber described here: https://github.com/PV-Lab/hte_degradation_chamber
 
-The picture data collected using the degradation chamber is analyzed with and without color calibration, a method for collecting repeatable and reproducible color data from pictures. Extracts the raw and color calibrated colors of each perovskite sample versus time during the aging test, and produces analysis graphs.
+The picture data collected using the degradation chamber is analyzed with and without color calibration that is a method for collecting repeatable and reproducible color data from pictures. The code extracts the raw and color calibrated mean colors of each perovskite sample versus time during the aging test, and produces analysis graphs.
 
 These analysis codes are part of an open-hardware project for developing degradation chambers for perovskite materials. The project is described in detail in our article: [insert details]
 
