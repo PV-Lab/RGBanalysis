@@ -53,19 +53,26 @@ The assumptions of the code on the alignment of the sample holder, samples, and 
 ![Sample locations and indexing when the user stands in front of the degradation chamber.](https://github.com/PV-Lab/RGBanalysis/blob/main/Sample_locations_and_indexing.jpg)
   
 - Use the same alignment of the sample holder, Xrite color chart, and small color chart than in the example data: "Data/Example_aging_test/". This ensures the right order of the samples in the resulting data files, and the correct color calibration in the color calibrated data.
+
 ![Example alignment of the sample holder and small color chart](https://github.com/PV-Lab/RGBanalysis/blob/main/Data/Example_aging_test/BMP/20190723161422.bmp)
 
 - The reference colors for Xrite are hard-coded into the program. They need to be modified if another chart is used.
 
 ## Installation
 
-To install, just clone this repository and analysis codes repository. Either download the repository as a ZIP file, or use git:
+Install Python programming platform Anaconda.
 
 `$ git clone https://github.com/PV-Lab/RGBanalysis.git`
 
 `$ cd RGBanalysis`
 
-To activate the video feature (Linux only): install ffmpeg (https://github.com/FFmpeg/FFmpeg) and run Main.py normally.
+`$ conda env create -f environment.yml`
+
+Activate environment "rgbanalysis".
+
+To activate the video feature (Linux only): install ffmpeg (https://github.com/FFmpeg/FFmpeg).
+
+Run Main.py.
 
 ## Use
 
