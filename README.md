@@ -47,12 +47,11 @@ The code produces color calibrated and raw color data as a function of measureme
 
 The assumptions of the code on the alignment of the sample holder, samples, and reference color charts:
 - There is a sample holder with 4 (horizontal rows in the picture area) x 7 (vertical columns in the picture area) samples in the picture area during the aging test.
-  - See "Sample locations and indexing.jpg" for an example of the sample positioning on a sample holder (A1 to D7) seen by a user standing in front of the degradation chamber, and how they are translated to the row indices (i) in the analysis results.
-  - In the pictures, the sample holder alignment is such that D1 is in the upper left corner.
+  - Here is an example of the sample positioning on a sample holder (A1 to D7) seen by a user standing in front of the degradation chamber, and how they are translated to the row indices (i) in the analysis results.
 
 <img src="https://github.com/PV-Lab/RGBanalysis/blob/master/Sample_locations_and_indexing.jpg" alt="Sample locations and indexing when the user stands in front of the degradation chamber." width="300"/>
   
-- Use the same alignment of the sample holder, Xrite color chart, and small color chart than in the example data: "Data/Example_aging_test/". This ensures the right order of the samples in the resulting data files, and the correct color calibration in the color calibrated data.
+- Use the same alignment of the sample holder, Xrite color chart, and small color chart than in the example data shown here. This ensures the right order of the samples in the resulting data files, and the correct color calibration in the color calibrated data. In the pictures taken by the chamber, the sample holder alignment is such that D1 is in the upper left corner:
 
 <img src="https://github.com/PV-Lab/RGBanalysis/blob/master/Data/Example_aging_test/BMP/20190723161422.bmp" alt="Sample and small color chart images." width="300"/>
 
