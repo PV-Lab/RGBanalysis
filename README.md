@@ -50,7 +50,9 @@ The assumptions of the code on the alignment of the sample holder, samples, and 
   - See "Sample locations and indexing.jpg" for an example of the sample positioning on a sample holder (A1 to D7) seen by a user standing in front of the degradation chamber, and how they are translated to the row indices (i) in the analysis results.
   - In the pictures, the sample holder alignment is such that D1 is in the upper left corner.
 
-![Sample locations and indexing when the user stands in front of the degradation chamber.](https://github.com/PV-Lab/RGBanalysis/blob/master/Sample_locations_and_indexing.jpg | width=100)
+![Sample locations and indexing when the user stands in front of the degradation chamber.](https://github.com/PV-Lab/RGBanalysis/blob/master/Sample_locations_and_indexing.jpg)
+
+<img src="[https://github.com/your_image.png](https://github.com/PV-Lab/RGBanalysis/blob/master/Sample_locations_and_indexing.jpg" alt="Sample locations and indexing when the user stands in front of the degradation chamber." width="250"/>
   
 - Use the same alignment of the sample holder, Xrite color chart, and small color chart than in the example data: "Data/Example_aging_test/". This ensures the right order of the samples in the resulting data files, and the correct color calibration in the color calibrated data.
 
