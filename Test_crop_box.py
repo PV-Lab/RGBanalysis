@@ -4,7 +4,12 @@
 Created on Thu Jan 10 17:52:22 2019
 
 @author: IsaacParker, Liu Zhe, Armi Tiihonen
+
+Script for testing how crop box and offset settings (i.e., settings for slicing the
+pictures into samples or color patches).
+
 """
+
 from RGB_extractor import get_image, image_slicing
 from PIL import Image
 import numpy as np
@@ -12,6 +17,8 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 
+
+def test_crop_box(pic_folder, pic_name, crop_box, offset_array, picture_target):
 # This function is used for plotting the given crop box for the given picture.
 # Input:
 # pic_folder: folder path as a string without ending slash.
@@ -30,8 +37,6 @@ import matplotlib.patches as patches
 # 
 # Output:
 # Nothing.
-
-def test_crop_box(pic_folder, pic_name, crop_box, offset_array, picture_target):
 
     # If the picture is from a color chart:
     if picture_target == 0:
@@ -75,16 +80,13 @@ def test_crop_box(pic_folder, pic_name, crop_box, offset_array, picture_target):
     
     ax.imshow(Image.fromarray(np.array(image1, dtype=np.uint8), 'RGB'))
     plt.show()
-    
-    #fig,ax = plt.subplots(1,figsize=(5,5))
-    #ax.imshow(Image.fromarray(reconstr, 'RGB'))
-    #plt.show()
-    
+
     print(testfile)
         
     return None
 
-def visualize_colors(data, space, picture_target):
+'''
+def visualize_colors(data, space, picture_target, pic_folder, pic_name, crop_box, offset_array, ):
 
     if picture_target == 0: # Color chart
         row_num=4
@@ -146,23 +148,24 @@ def visualize_colors(data, space, picture_target):
     print(testfile)
         
     return None
+'''
+
+pic_folder = './Data/Example_aging_test/BMP'
+pic_name_Xrite = '20190723160422.bmp'
+pic_name_samples = '20190724102950.bmp' # Example image for adjusting crop box.
+pic_name_scc = pic_name_samples # Small color chart
 
 #Xrite passport    
-test_crop_box('./20190423-R1-AT/BMP', '20190422121726.bmp', (360+0,280+245,850-70,850-50), [[20,20],[20,20]], 0) #476, 315
+crop_box_Xrite = (435,430,435+480,430+310) # (left, upper, right, lower)
+offset_Xrite = [[20,20],[20,20]] # [[left,right],[upper,lower]]
+test_crop_box(pic_folder, pic_name_Xrite, crop_box_Xrite, offset_Xrite, 0) #476, 315
+
 # samples
-test_crop_box('./20190423-R1-AT/BMP', '20190423113654.bmp',
-             (285,382,785,845), [[36,38],[23,21]], 1)
+crop_box_samples = (358,270,358+570,270+505) # (left, upper, right, lower)
+offset_samples = [[17,17],[14,14]] # [[left,right],[upper,lower]]
+test_crop_box(pic_folder, pic_name_samples, crop_box_samples, offset_samples, 1)
+
 # small color chart
-test_crop_box('./20190423-R1-AT/BMP', '20190423113654.bmp',
-             (490,200,680,320), [[8,8],[8,8]], 0)
-
-#
-'''
-crop_box_CC = (483,200,680,320) # Small color chart
-offset_array_CC = [[8,8],[8,8]]
-crop_box_samples = (270,390,785,845) # Films on sample holder
-offset_array_samples = [[33,18],[18,18]]
-crop_box_Xrite = (350+60,250+245,900-80,850-80) # Xrite passport
-offset_array_Xrite = [[20,20],[20,20]]
-
-'''
+crop_box_scc = (575,39,575+223,39+150) # (left, upper, right, lower)
+offset_scc = [[8,8],[8,8]] # [[left,right],[upper,lower]]
+test_crop_box(pic_folder, pic_name_scc, crop_box_scc, offset_scc, 0)

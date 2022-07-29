@@ -26,6 +26,7 @@ import os
 # Part 1/2: Functions related to color space conversions and color calibration.
 ###############################################################################
 
+def convert_color_space(data, from_space, to_space):
 # Input:
 # - data: a np array with dimensions (n_samples, {optional
 #   dimension: n_times}, n_color_coordinates=3) (e.g., a direct output of
@@ -34,7 +35,7 @@ import os
 # - to_space: choose either 'RGB' or 'Lab'
 # Output:
 # - converted: a np array with the same dimensions than in the input
-def convert_color_space(data, from_space, to_space):
+
     # We need the code to work for inputs containing the optional dimension
     # n_times (i.e., many time points) and for inputs containing only one time
     # point.
@@ -57,13 +58,7 @@ def convert_color_space(data, from_space, to_space):
         # We got a matrix of color objects. Let's transform to a 3D matrix of floats.
         converted = np.transpose(np.vectorize(lambda x: (x.lab_l, x.lab_a, x.lab_b))(
             converted_objects), (1,2,0))
-        # This one works too. I don't know which one would be better.
-        #converted = np.array([[(converted_objects[x,y].lab_l,
-        #                         converted_objects[x,y].lab_a,
-        #                         converted_objects[x,y].lab_b) for y in range(
-        #                         converted_objects.shape[1])] for x in range(
-        #                         converted_objects.shape[0])])
-        # We want output to be in the same shape than the input.
+        
     elif (from_space == 'Lab') and (to_space == 'RGB'):
         data_objects = np.vectorize(lambda x,y,z: LabColor(x,y,z))(
             data[:,:,0], data[:,:,1], data[:,:,2])
@@ -81,12 +76,10 @@ def convert_color_space(data, from_space, to_space):
         converted = np.squeeze(converted)
     return (converted)
 
-#sample_rgb = results_rgb[0]
-#pic_folder_Xrite = pic_folder
 
 
 def color_calibration(sample_rgb, pic_folder_Xrite, pic_name_Xrite,
-                      crop_box_Xrite, offset_array_Xrite):
+                      crop_box_Xrite, offset_array_Xrite, plot_images):
 
     
     # Reference data for Xrite color chart in Lab (from
@@ -110,7 +103,8 @@ def color_calibration(sample_rgb, pic_folder_Xrite, pic_name_Xrite,
     
     # Let's extract the rgb colors from our Xrite color passport picture.
     CC_rgb = rgb_extractor_Xrite_CC(pic_folder_Xrite, pic_name_Xrite,
-                                    crop_box_Xrite, offset_array_Xrite)
+                                    crop_box_Xrite, offset_array_Xrite,
+                                    plot_images)
     # Convert from RGB to Lab color space.
     CC_lab = convert_color_space(CC_rgb, 'RGB', 'Lab')
     sample_lab = convert_color_space(sample_rgb, 'RGB', 'Lab')
@@ -150,11 +144,11 @@ def color_calibration(sample_rgb, pic_folder_Xrite, pic_name_Xrite,
     # Checking if went ok. We should get the same result than in V (exept for
     # the 4 bottom rows)
     CC_lab_double_transformation = np.matmul(denominator,WA)
-    print('Color chart patches in reference Lab:', reference_CC_lab,
-          'Color chart patches transformed to color calibrated space and back - this should be the same than above apart from the last 4 rows',
-          CC_lab_double_transformation, 'subtracted: ', reference_CC_lab-CC_lab_double_transformation[0:-4,:])
-    # --> Went ok!
-
+    #print('Color chart patches in reference Lab:', reference_CC_lab,
+    #      'Color chart patches transformed to color calibrated space and back - this should be the same than above apart from the last 4 rows',
+    #      CC_lab_double_transformation, 'subtracted: ', reference_CC_lab-CC_lab_double_transformation[0:-4,:])
+    print('Checking if color transformation is successful - all values here should be near zero:/n', reference_CC_lab-CC_lab_double_transformation[0:-4,:])
+    
     # Let's perform color calibration for the sample points!
     N_samples = sample_lab.shape[0]
     N_times = sample_lab.shape[1]
@@ -172,7 +166,6 @@ def color_calibration(sample_rgb, pic_folder_Xrite, pic_name_Xrite,
                 r_ij = np.sqrt((P_new[i,0+1]-P[j,0+1])**2 + (P_new[i,1+1]-P[j,1+1])**2 + (P_new[i,2+1]-P[j,2+1])**2)
                 U_ij = 2* (r_ij**2)* np.log(r_ij + 10**(-20))
                 K_new[i,j] = U_ij
-        #sample_lab_cal[s,:,:] = np.matmul(np.concatenate((K_new,P_new),axis=1), WA)
         dennom = np.concatenate((K_new,P_new),axis=1)
         denden = np.concatenate((np.transpose(P), np.zeros((4,4))), axis=1)
         sample_lab_cal[s,:,:] = np.matmul(np.concatenate((dennom, denden), axis=0), WA)
@@ -207,10 +200,17 @@ def color_calibration_results(results_rgb, color_cal_inputs):
     offset_array_Xrite = color_cal_inputs[3]
     results_rgb_cal = [0,0,0,0, results_rgb[4], 0, 0, results_rgb[7]]
     results_lab_cal = [0,0,0,0, results_rgb[4], 0, 0, results_rgb[7]]
+    # Repeated color calibration for sample_rgb, sample_rgb_percentiles_lo,
+    # sample_rgb_percentiles_hi, and CC_rgb.
     for i in range(0,4):
+        if i == 0:
+            plot_images = True
+        else:
+            plot_images = False
         (results_rgb_cal[i], results_lab_cal[i]) = color_calibration(results_rgb[i],
                                         pic_folder, pic_name_Xrite,
-                                        crop_box_Xrite, offset_array_Xrite)
+                                        crop_box_Xrite, offset_array_Xrite, plot_images)
+        
 
 
     # Let's plot the data.

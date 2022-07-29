@@ -26,7 +26,9 @@ import numpy as np
 #          CC, times, fig_CC, fig_samples]
 # colorspace: input either 'RGB' or 'Lab'
 # calibrated: input either 0 (raw data) or 1 (color calibrated data)
-def save_results(results, colorspace, calibrated, sample_description):
+# sample_description: string descriptions of each sample
+# results_folder: Folder to which the code saves the result files.
+def save_results(results, colorspace, calibrated, sample_description, results_folder):
 
     sample = results[0]
     sample_percentiles_lo = results[1]
@@ -39,17 +41,17 @@ def save_results(results, colorspace, calibrated, sample_description):
     folderpath = ''
     if colorspace == 'RGB':
         if calibrated == 0:
-            folderpath = './RGB/Raw'
+            folderpath = results_folder + '/RGB/Raw'
             filename_body = ['_r.csv', '_g.csv', '_b.csv']
         elif calibrated == 1:
-            folderpath = './RGB/Calibrated'
+            folderpath = results_folder + '/RGB/Calibrated'
             filename_body = ['_r_cal.csv', '_g_cal.csv', '_b_cal.csv']
     elif colorspace == 'Lab':
         if calibrated == 0:
-            folderpath = './Lab/Raw'
+            folderpath = results_folder + '/Lab/Raw'
             filename_body = ['_Ll.csv', '_La.csv', '_Lb.csv']
         elif calibrated == 1:
-            folderpath = './Lab/Calibrated'
+            folderpath = results_folder + '/Lab/Calibrated'
             filename_body = ['_Ll_cal.csv', '_La_cal.csv', '_Lb_cal.csv']
             
     if not os.path.exists(folderpath):
@@ -113,9 +115,9 @@ sample_holder_locations = ['D1', 'C1', 'B1', 'A1',
 
 # FILL IN THE DETAILS OF THE AGING TEST:
 
-# Fill in the sample ids in string format in the same order than is presented
-# in variable 'sample_holder_locations' (see above). If the position has been
-# left empty, give '-'.
+# Fill in the sample ids in string format in the same order than what
+# is presented in the variable 'sample_holder_locations' (see above).
+# If the position has been left empty, give '-'.
 sample_ids = ['0', '0', '0', '0',
               '0', '0', '0', '0',
               '0', '0', '0', '0',
@@ -124,12 +126,13 @@ sample_ids = ['0', '0', '0', '0',
               '0', '0', '0', '0',
               '0', '0', '0', '0']
 
-# Which elements you are optimizing in the sample composition? E.g.,
-# elements = ['Cs', 'FA', 'MA']
+# From which elements the samples are composed of?
 elements = ['MAPbI', 'FAPbI', 'CsPbI']
-# Fill in sample compositions. Give zero values if the position is
-# empty. Otherwise the compositions should sum up till 100. E.g.,
-# 10% Cs, 50% MA, 40% FA would be written as [0.1, 0.5, 0.4].
+
+# Fill in sample compositions.
+# Give all zero values if the position is empty.
+# Otherwise the compositions should sum up till 1. E.g., 10% of Cs, 50% of MA,
+# 40% FA would be written as [0.1, 0.5, 0.4].
 sample_compositions = np.array(
         [[1.00,0.00,0.00], [1.00,0.00,0.00], [1.00,0.00,0.00], [1.00,0.00,0.00],
         [1.00,0.00,0.00], [1.00,0.00,0.00], [1.00,0.00,0.00], [1.00,0.00,0.00],
@@ -151,36 +154,51 @@ comments = ['-', '-', '-', '-',
 
 # Give the path to the folder that contains the pictures (without ending
 # slash). Use '/' for linux and '\' for Windows.
-#
-# Important: You need to clean up the data before running the code. The code
-# assumes the (alphabetically) first picture in the folder has been taken of
-# Xrite color chart (i.e., this picture will not be analyzed) and all the other
-# pictures are taken of sample holder (these pictures will be analyzed). 
-pic_folder = './20190419-R1-AT/BMP'
+# Note: The code assumes that the data folder contains only pictures from the
+# aging test. See the assumptions on the filenames, sample alignment, and
+# color chart alignment from the Github repository
+# ( https://github.com/PV-Lab/RGBanalysis ).
+# Note 2: The code assumes that the (alphabetically) first picture in the
+# folder has been taken of Xrite color chart (i.e., this picture will not be
+# analyzed) and all the other pictures are taken of sample holder (these
+# pictures will be analyzed). 
+pic_folder = './Data/Example_aging_test/BMP'
 # Give the name of the picture that has been taken taken of Xrite color chart.
-pic_name_Xrite = '20190418144438.bmp'
+pic_name_Xrite = '20190723160422.bmp'
+
+# Give the path to the folder where the code saves the results:
+results_folder = './Results/Example_aging_test'
 
 # Give the settings for finding the samples and color chart patches from the
 # pics.
-# Optimize using Color_operations.py if necessary. Explanations in the same ile.
-crop_box_CC = (483,200,680,320) # Small color chart
-offset_array_CC = [[8,8],[8,8]]
-crop_box_samples = (270,390,785,845) # Films on sample holder
-offset_array_samples = [[33,18],[18,18]]
-crop_box_Xrite = (360+0,250+245,850-80,850-80) # Xrite passport
-offset_array_Xrite = [[20,20],[20,20]]
+# Crop boxes are defined as (left, upper, right, lower) edge of the crop
+# box in the picture (in pixels).
+# Offset regions are dropped from around the edges of each sample or color
+# patch (to cut out uneven edges of the sample). They are defined as
+# [[left,right],[upper,lower]] offset (in pixels).
+#
+# Note: Optimize the values using Color_operations.py if necessary. Further
+# explanations in the same file.
+# 
+crop_box_scc = (575,39,575+223,39+150) # Small color chart
+offset_scc = [[8,8],[8,8]]
+crop_box_samples = (358,270,358+570,270+505) # Films on sample holder
+offset_samples = [[17,17],[14,14]]
+crop_box_Xrite = (435,430,435+480,430+310) # Xrite passport
+offset_Xrite = [[20,20],[20,20]]
 
-# How often do you want to print out figures? The cropping of every nth pic
-# will be printed to the console. For short aging tests, value 1 is
-# good, for very long ones you might put even 250 to make the code run faster.
-print_out_interval = 1
+# How often do you want to print out previews of the cropped images to the
+# console (every nth picture)? For short aging tests, value 1 is okay. Code
+# runs faster if the value is large (250 is sufficient for long aging tests).
+print_out_interval = 5
 
 ###############################################################################
+# COMPUTATION
+# Extract color data, perform color calibration, and save the results.
 
-# For Campaign 2.0, we assume the sum of the compositions to be exactly 1 (100%).
-# This does not necessarily hold for other projects. This property is meant for
-# ensuring integrity in cases where the sum of sample materials sums to 0.99
-# instead of 1 because of rounding.
+# Rounding. Here, we assume that the sum of the compositional elements is
+# exactly 1 (100%) with resolution of 0.01 (1%). This does not necessarily hold
+# for other projects, in which case it should be commented out.
 for i in range(0,len(sample_compositions)):
     if (np.sum(sample_compositions[i]) != 1) & (np.sum(sample_compositions[i]) != 0):
         sample_compositions[i] = np.round(sample_compositions[i]/np.sum(
@@ -190,17 +208,10 @@ for i in range(0,len(sample_compositions)):
 sample_description = [sample_holder_locations, sample_ids, sample_compositions,
                       elements, comments]
 
-
-
-
-
-
-
-
 # THE RESULTS in rgb color space (no color calibration)
-results_rgb = rgb_extractor(pic_folder, crop_box_samples, offset_array_samples,
-                            crop_box_CC, offset_array_CC, print_out_interval)
-save_results(results_rgb, 'RGB', 0, sample_description)
+results_rgb = rgb_extractor(pic_folder, crop_box_samples, offset_samples,
+                            crop_box_scc, offset_scc, print_out_interval)
+save_results(results_rgb, 'RGB', 0, sample_description, results_folder)
 # Output explained: 
 # results_rgb = [sample_rgb, sample_rgb_percentiles_lo,
 # sample_rgb_percentiles_hi, CC_rgb, times, fig_CC_rgb, fig_samples_rgb]
@@ -221,33 +232,35 @@ save_results(results_rgb, 'RGB', 0, sample_description)
 
 # Let's convert these to Lab (no color calibration)
 results_lab = color_conversion_results(results_rgb)
-save_results(results_lab, 'Lab', 0, sample_description)   
+save_results(results_lab, 'Lab', 0, sample_description, results_folder)   
 
 # Let's perform color calibration and save the data in both RGB and Lab
 # formats.
 [results_rgb_cal, results_lab_cal] = color_calibration_results(results_rgb,
-    [pic_folder, pic_name_Xrite, crop_box_Xrite, offset_array_Xrite])    
-save_results(results_rgb_cal, 'RGB', 1, sample_description)   
-save_results(results_lab_cal, 'Lab', 1, sample_description)   
-
-# Let's produce a video about the pictures (i.e. corresponds to raw RGB data).
-# This should be commented unless you have the necessary software installed.
-save_as_video(pic_folder, crop_box_samples, crop_box_CC, 1, 'bmp')
+    [pic_folder, pic_name_Xrite, crop_box_Xrite, offset_Xrite])    
+save_results(results_rgb_cal, 'RGB', 1, sample_description, results_folder)   
+save_results(results_lab_cal, 'Lab', 1, sample_description, results_folder)   
 
 
-# TO DO: This part does not necessarily work for Windows at the moment. Need to
-# be updated. Until that, keep commented.
+###############################################################################
+# COMPLEMENTARY VIDEO AND VISUALIZATION
+# Keep this section commented out if you use Windows.
+
+# Let's produce a video about the unedited pictures (i.e. corresponds to raw
+# RGB data). This should be commented unless you have the necessary software installed.
+save_as_video(pic_folder, crop_box_samples, crop_box_scc, 1, 'bmp', results_folder)
+
+
+# The following part has not been tested for Windows.
 # 
-# Let's plot images illustrating the selected sample areas from the pictures
-# and the determined color of each sample. This is done for both unedited
-# pictures (i.e., raw RGB) and color calibrated data (i.e., calibrated RGB).
-# These pictures can be utilized for checking if the selected areas are correct
-# and for checking how color calibration affects the colors.
-# Additionally, we make a video on both folders.
-crop_box = crop_box_samples
-offset_array = offset_array_samples
-save_to_folder_raw = './RGB/Raw/Cropped pics'
-save_to_folder_cal = './RGB/Calibrated/Cropped pics'
+# Let's plot ans save pictures illustrating the crop boxes and the mean color
+# of each sample (in raw and calibrated colors).
+# Note: These pictures are saved for later checking if the crop boxes have been
+# correct and confirming how the color calibration affects the colors.
+crop_box_ill = crop_box_samples
+offset_ill = offset_samples
+save_to_folder_raw = results_folder + '/RGB/Raw/Cropped pics'
+save_to_folder_cal = results_folder + '/RGB/Calibrated/Cropped pics'
 if not os.path.exists(save_to_folder_raw):
         os.makedirs(save_to_folder_raw)
 if not os.path.exists(save_to_folder_cal):
@@ -261,15 +274,16 @@ for i in range(0,len(results_rgb[-1])):
         color_array_raw = results_rgb[0][:,i,:]
         color_array_cal = results_rgb_cal[0][:,i,:]
         #print('i',i)
-        plot_colors(pic_path, crop_box, offset_array,
+        plot_colors(pic_path, crop_box_ill, offset_ill,
                 color_array_raw, save_to_folder_raw, savefig, '', print_out)
-        plot_colors(pic_path, crop_box, offset_array,
+        plot_colors(pic_path, crop_box_ill, offset_ill,
                 color_array_cal, save_to_folder_cal, savefig, '', print_out)
     else:
         print_out = 0
     
-# These lines should be commented unless you have the necessary software installed.
-save_as_video(save_to_folder_raw, crop_box_samples, crop_box_CC, 0, 'jpg', 'Raw_mean_colors')
-save_as_video(save_to_folder_cal, crop_box_samples, crop_box_CC, 0, 'jpg', 'Calibrated_mean_colors')
+# Additionally, both series of pictures are saved in video format (only for
+# Linux).
+save_as_video(save_to_folder_raw, crop_box_samples, crop_box_scc, 0, 'jpg', results_folder + '/Raw_mean_colors')
+save_as_video(save_to_folder_cal, crop_box_samples, crop_box_scc, 0, 'jpg', results_folder + '/Calibrated_mean_colors')
 
 

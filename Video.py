@@ -46,17 +46,17 @@ def create_video_name(folder):
     slashes = substring_indexes('/', folder)
     video_name = 'video'
     if len(slashes) > 1:
-        video_name = folder[(slashes[0]+1):slashes[1]]
+        video_name = folder[(slashes[-2]+1):slashes[-1]]
     elif len(slashes) == 1:
         video_name = folder[(slashes[0]+1)::]
     return video_name
     
 
-def save_as_video(folder, crop_box_samples, crop_box_CC, crop, pic_file_type, video_name = None):
+def save_as_video(folder, crop_box_samples, crop_box_CC, crop, pic_file_type, video_name = None, results_folder = '.'):
     # The name of the videos is either the name of the aging test (default) or
     # the name given by the user.
     if video_name == None:
-        video_name = create_video_name(folder)
+        video_name = result_folder + '/' + create_video_name(folder)
     
     # Details for cropping the video
     space = 90 # Extra space around the sample holder and color chart to make the video look more nice.
@@ -66,10 +66,12 @@ def save_as_video(folder, crop_box_samples, crop_box_CC, crop, pic_file_type, vi
     top_left_y = str(round(crop_box_CC[1] - space/2)) # # Top left y coordinate of the video image.
     # 520:720:320:150    
     
-    #framerate = str(round(475000/len(os.listdir(folder)))) # This produces a good framerate for long aging tests.
-    framerate = str(round(len(os.listdir(folder))/8)) # This always produces an 8s video
+    # This produces a good framerate for long aging tests.
+    #framerate = str(round(475000/len(os.listdir(folder))))
+    
+    # This always produces an 8s video
+    framerate = str(round(len(os.listdir(folder))/8))
             
-    #command = 'ffmpeg -f image2 -framerate 150 -i \'' + folder + '/%*.jpg\' -f mp4 -q:v 0 -vcodec mpeg4 -r 150 ' + video_name + '.mp4'#-r 150 -b 5000k -vcodec mpeg4 -y movie.mp4'
     print(framerate, folder, pic_file_type, video_name)
     command = 'ffmpeg -f image2 -framerate ' + framerate + ' -i \"' + folder + '/%*.' + pic_file_type + '\" -f mp4 -q:v 0 -vcodec mpeg4 -r ' + framerate + ' ' + video_name + '.mp4'#-r 150 -b 5000k -vcodec mpeg4 -y movie.mp4'
     os.system(command)

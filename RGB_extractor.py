@@ -19,6 +19,7 @@ from os.path import isfile, join
 
 def get_image(image_path, crop_box):
     """Get a numpy array of an image so that one can access values[x][y]."""
+    
     image = Image.open(image_path, 'r')
     image = image.crop(box=crop_box) #box=(left, upper, right, lower)
     [width,height] = image.size
@@ -32,10 +33,12 @@ def get_image(image_path, crop_box):
         return None
     pixel_values = np.array(pixel_values).reshape((height, width, channels))
     image.close()
+    
     return (width,height,pixel_values)
 
 def image_slicing(image_array, col_num,row_num,offset_array):
     """slice the ROIs from an image of an array of samples/colorcard"""
+    
     row_h = int(image_array.shape[0]/row_num)
     col_w = int(image_array.shape[1]/col_num)
     
@@ -64,9 +67,13 @@ def image_slicing(image_array, col_num,row_num,offset_array):
     
         imagecol.append(np.concatenate(imagerow, axis=1))
     image_reconstr = np.array(np.concatenate(imagecol, axis=0), dtype=np.uint8)
+    
     return [fig, ax, image_reconstr, images]
 
 
+
+def rgb_extractor(pic_folder, crop_box_samples, offset_array_samples,
+                  crop_box_CC, offset_array_CC, print_out_interval):
 
 # Purpose:
 # Extracts the RGB colors of the samples in all pictures in the folder (except for
@@ -103,8 +110,8 @@ def image_slicing(image_array, col_num,row_num,offset_array):
 #   - fig_CC_rgb: a plot about rgb values vs time in each color patch of the
 #     small color chart
 #   - fig_samples_rgb: a plot about rgb values vs time in each sample
-def rgb_extractor(pic_folder, crop_box_samples, offset_array_samples,
-                  crop_box_CC, offset_array_CC, print_out_interval):
+
+
     #%%
     # Read all the files from a specified directory
     files=[]
@@ -132,16 +139,16 @@ def rgb_extractor(pic_folder, crop_box_samples, offset_array_samples,
     fc='none' # face color
     
     ########%%%%%%%%%%%%%%%%%%%%%%%%###############
-    # Croping Box for Sample Region (TO BE CHANGED)
-    crop_box_Sample = crop_box_samples#(350+35,250+60,900-20,850-75)#(left, upper, right, lower)
+    # Crop Box for Sample Region
+    crop_box_Sample = crop_box_samples #(left, upper, right, lower)
     ########%%%%%%%%%%%%%%%%%%%%%%%%###############
     box= crop_box_Sample
     rect1 = patches.Rectangle((box[0],box[1]),box[2]-box[0],box[3]-box[1],
                               linewidth=lw,edgecolor=ec,facecolor=fc)
     
     ########%%%%%%%%%%%%%%%%%%%%%%%%###############
-    # Croping Box for Color Card (TO BE CHANGED)
-    crop_box_ColorCard = crop_box_CC#(571,111,770,245)#(left, upper, right, lower)
+    # Crop Box for Small Color Chart
+    crop_box_ColorCard = crop_box_CC #(left, upper, right, lower)
     ########%%%%%%%%%%%%%%%%%%%%%%%%###############
     box= crop_box_ColorCard
     rect2 = patches.Rectangle((box[0],box[1]),box[2]-box[0],box[3]-box[1],
@@ -172,10 +179,10 @@ def rgb_extractor(pic_folder, crop_box_samples, offset_array_samples,
     # Sample Cropping
     [w,h,image_ROI_Sample]=get_image(testfile,crop_box_Sample)
     ########%%%%%%%%%%%%%%%%%%%%%%%%###############
-    # Row, Columns Settings and Offset pixels for each sample (TO BE CHANGED)
+    # Row, Columns Settings and Offset pixels for each sample
     row_num_Sample=7
     col_num_Sample=4
-    offset_array_Sample = offset_array_samples#[[40,10],[15,10]]#[[x_left,x_right],[y_upper,y_lower]]
+    offset_array_Sample = offset_array_samples #[[x_left,x_right],[y_upper,y_lower]]
     ########%%%%%%%%%%%%%%%%%%%%%%%%###############
     [fig_ROI, ax_ROI, reconstr_ROI, image_ROI]= image_slicing(
             image_ROI_Sample, col_num_Sample, row_num_Sample, offset_array_Sample)
@@ -204,7 +211,7 @@ def rgb_extractor(pic_folder, crop_box_samples, offset_array_samples,
     sample_g_lo_timeseries = []
     sample_b_lo_timeseries = []
     ########%%%%%%%%%%%%%%%%%%%%%%%%###############
-    picfiles = files[1::] #Select the use fully pictures only. Skips the first
+    picfiles = files[1::] #Select the useful pictures only. Skip the first
     # picture (i.e., Xrite color passport picture).
     ########%%%%%%%%%%%%%%%%%%%%%%%%###############
     time_fmt = '%Y%m%d%H%M%S'# grabbing the time from the filenames
@@ -289,18 +296,6 @@ def rgb_extractor(pic_folder, crop_box_samples, offset_array_samples,
     sample_g_lo_timeseries = np.array(sample_g_lo_timeseries).T
     sample_b_lo_timeseries = np.array(sample_b_lo_timeseries).T
     
-    # Sorting and return values
-    #x = np.array([6, 7, 1, 2])
-    #a=np.array([6, 7, 1, 2])
-    #b=np.array([2, 1, 6, 7])
-    #c=np.array([7, 6, 2, 1])
-    #order = np.argsort(x)
-    #a = x[order]
-    #Mnew = np.array([b[order],c[order],d[order]])
-    #Morig = np.sort(np.array([x,a,b,c]),axis = 1)
-    #print(Mnew)
-    #print(Morig)
-    
     order = np.argsort(t)
     t_sort = t[order]
     r_sort = sample_r_timeseries[:,order]
@@ -368,20 +363,16 @@ def plot_aging_data(row_num_CC,col_num_CC,t_sort, CC_r_sort, CC_g_sort, CC_b_sor
     for r in np.arange(row_num_CC):
         for c in np.arange(col_num_CC):
             i = c + r*col_num_CC
-            #[t_sort, CC_r_sort,CC_g_sort,CC_b_sort] = np.sort(np.array([t,
-            #         CC_r_timeseries[i],
-            #         CC_g_timeseries[i],
-            #         CC_b_timeseries[i]]),axis = 1)
-        
+            
             axs_CC[r][c].plot(t_sort, CC_r_sort[i],color='r')
             axs_CC[r][c].plot(t_sort, CC_g_sort[i],color='g')
             axs_CC[r][c].plot(t_sort, CC_b_sort[i],color='b')    
             
     if datatype == 'RGB':
-        fig_CC.text(0.5, 0.90,'ColorCard RGB (rows - columns)',ha='center',fontsize=14)
-        fig_CC.text(0.06, 0.5,'RGB Value [0-256]',va='center',rotation='vertical',fontsize=12)
+        fig_CC.text(0.5, 0.90,'Small Color Chart Colors',ha='center',fontsize=14)
+        fig_CC.text(0.06, 0.5,'RGB Value [0-255]',va='center',rotation='vertical',fontsize=12)
     elif datatype == 'Lab':
-        fig_CC.text(0.5, 0.90,'ColorCard Lab (rows - columns)',ha='center',fontsize=14)
+        fig_CC.text(0.5, 0.90,'Small Color Chart Colors',ha='center',fontsize=14)
         fig_CC.text(0.06, 0.5,'Lab Value [-100 - +100]',va='center',rotation='vertical',fontsize=12)
     fig_CC.text(0.5, 0.04,'Time [min]',ha='center', fontsize=12)
     plt.show()
@@ -392,18 +383,6 @@ def plot_aging_data(row_num_CC,col_num_CC,t_sort, CC_r_sort, CC_g_sort, CC_b_sor
     for r in np.arange(row_num_Sample):
         for c in np.arange(col_num_Sample):
             i = c + r*col_num_Sample
-            """[t_sort, r_sort,g_sort,b_sort] = np.sort(np.array([t,
-                     sample_r_timeseries[i],
-                     sample_g_timeseries[i],
-                     sample_b_timeseries[i]]),axis = 1)           
-            [t_sort, r_hi_sort,g_hi_sort,b_hi_sort] = np.sort(np.array([t,
-                     sample_r_hi_timeseries[i],
-                     sample_g_hi_timeseries[i],
-                     sample_b_hi_timeseries[i]]),axis = 1)
-            [t_sort, r_lo_sort,g_lo_sort,b_lo_sort] = np.sort(np.array([t,
-                     sample_r_lo_timeseries[i],
-                     sample_g_lo_timeseries[i],
-                     sample_b_lo_timeseries[i]]),axis = 1)"""
             
             axs_samples[r][c].plot(t_sort, r_sort[i],color='r')      
             axs_samples[r][c].plot(t_sort, g_sort[i],color='g')
@@ -420,10 +399,10 @@ def plot_aging_data(row_num_CC,col_num_CC,t_sort, CC_r_sort, CC_g_sort, CC_b_sor
                 plt.ylim((-100, 100))
     #
     if datatype == 'RGB':
-        fig_samples.text(0.5, 0.90,'Sample RGB (rows - columns) [dotted: 5%perc; dashed: 95%perc; solid: mean]',ha='center',fontsize=14)
-        fig_samples.text(0.06, 0.5,'RGB Value [0-256]',va='center',rotation='vertical',fontsize=12)
+        fig_samples.text(0.5, 0.90,'Sample Colors [dotted: 5% perc.; dashed: 95% perc.; solid: mean]',ha='center',fontsize=14)
+        fig_samples.text(0.06, 0.5,'RGB Value [0-255]',va='center',rotation='vertical',fontsize=12)
     elif datatype == 'Lab':
-        fig_samples.text(0.5, 0.90,'Sample Lab (rows - columns) [dotted: 5%perc; dashed: 95%perc; solid: mean]',ha='center',fontsize=14)
+        fig_samples.text(0.5, 0.90,'Sample Colors [dotted: 5% perc.; dashed: 95% perc.; solid: mean]',ha='center',fontsize=14)
         fig_samples.text(0.06, 0.5,'Lab Value [-100 - +100]',va='center',rotation='vertical',fontsize=12)
     fig_samples.text(0.5, 0.08,'Time [min]',ha='center',fontsize=12)
     

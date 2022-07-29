@@ -1,0 +1,12 @@
+name: rgbanalysis
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - spyder==5.1.5
+  - pillow
+  - numpy
+  - matplotlib
+  - colormath
+  - pandas
+prefix: /home/armi/anaconda3/envs/rgbanalysis
