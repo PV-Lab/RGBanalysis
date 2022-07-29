@@ -54,11 +54,9 @@ The assumptions of the code on the alignment of the sample holder, samples, and 
   
 - Use the same alignment of the sample holder, Xrite color chart, and small color chart than in the example data: "Data/Example_aging_test/". This ensures the right order of the samples in the resulting data files, and the correct color calibration in the color calibrated data.
 
-![Example alignment of the sample holder and small color chart](https://github.com/PV-Lab/RGBanalysis/blob/master/Data/Example_aging_test/BMP/20190723161422.bmp | width=100)
 
-<img src="https://camo.githubusercontent.com/..." data-canonical-src="https://gyazo.com/eb5c5741b6a9a16c692170a41a49c858.png" width="200"
 
-     <img src="[http://url.to/image.png](https://github.com/PV-Lab/RGBanalysis/blob/master/Data/Example_aging_test/BMP/20190723161422.bmp)" align="left" height="100" >
+    <a href="https://github.com/PV-Lab/RGBanalysis/blob/master/Data/Example_aging_test/BMP/20190723161422.bmp"> <img src="[http://url.to/image.png](https://github.com/PV-Lab/RGBanalysis/blob/master/Data/Example_aging_test/BMP/20190723161422.bmp)" align="left" height="100" ></a>
 
 - The reference colors for Xrite are hard-coded into the program. They need to be modified if another chart is used.
 
